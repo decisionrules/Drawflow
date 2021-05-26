@@ -1,6 +1,5 @@
 export default class Drawflow {
   constructor(container, render = null) {
-    this.ddd = {}
     this.events = {};
     this.container = container;
     this.precanvas = null;
@@ -358,7 +357,7 @@ export default class Drawflow {
       //}
     }
     if(this.drag) {
-
+      this.dispatch('beforeNodeMoved', this.ele_selected.id.slice(5));
       var x = (this.pos_x - e_pos_x) * this.precanvas.clientWidth / (this.precanvas.clientWidth * this.zoom);
       var y = (this.pos_y - e_pos_y) * this.precanvas.clientHeight / (this.precanvas.clientHeight * this.zoom);
       this.pos_x = e_pos_x;
@@ -1403,6 +1402,8 @@ export default class Drawflow {
       } else {
         var object = object[name]
       }
+      this.dispatch('beforeNodeCreated', newNodeId);
+
       if(object !== null) {
         Object.entries(object).forEach(function (key, value) {
           if(typeof key[1] === "object") {
@@ -1841,6 +1842,7 @@ export default class Drawflow {
   }
 
   removeNodeId(id) {
+    this.dispatch('beforeNodeRemoved', id.slice(5));
     this.removeConnectionNodeId(id);
     var moduleName = this.getModuleFromNodeId(id.slice(5))
     if(this.module === moduleName) {
@@ -1852,6 +1854,7 @@ export default class Drawflow {
 
   removeConnection() {
     if(this.connection_selected != null) {
+      this.dispatch('beforeConnectionRemoved');
       var listclass = this.connection_selected.parentElement.classList;
       this.connection_selected.parentElement.remove();
       //console.log(listclass);
@@ -1870,6 +1873,7 @@ export default class Drawflow {
   }
 
   removeSingleConnection(id_output, id_input, output_class, input_class) {
+    this.dispatch('beforeConnectionRemoved');
     var nodeOneModule = this.getModuleFromNodeId(id_output);
     var nodeTwoModule = this.getModuleFromNodeId(id_input);
     if(nodeOneModule === nodeTwoModule) {
@@ -1908,6 +1912,8 @@ export default class Drawflow {
   }
 
   removeConnectionNodeId(id) {
+    this.dispatch('beforeConnectionRemoved');
+
     const idSearchIn = 'node_in_'+id;
     const idSearchOut = 'node_out_'+id;
 

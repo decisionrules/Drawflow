@@ -5,6 +5,6 @@ module.exports = {
     libraryTarget: 'umd',
     libraryExport: 'default',
     filename: 'drawflow.min.js',
-    globalObject: `(typeof self !== 'undefined' ? self : this)`
+    globalObject: `(typeof self !== 'undefined' ? self : this)`,
   }
 };
