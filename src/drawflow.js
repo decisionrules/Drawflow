@@ -1,5 +1,6 @@
 export default class Drawflow {
   constructor(container, render = null) {
+    this.ddd = {}
     this.events = {};
     this.container = container;
     this.precanvas = null;
