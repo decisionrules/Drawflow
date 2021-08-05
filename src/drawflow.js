@@ -1849,7 +1849,7 @@ export default class Drawflow {
     this.dispatch('beforeNodeRemoved', id.slice(5));
     this.removeConnectionNodeId(id);
     var moduleName = this.getModuleFromNodeId(id.slice(5))
-    if(this.module === moduleName && this.container.querySelector(`#${id}`)) {
+    if(this.module === moduleName) {
       this.container.querySelector(`#${id}`).remove();
     }
     delete this.drawflow.drawflow[moduleName].data[id.slice(5)];
