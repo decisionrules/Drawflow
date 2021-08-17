@@ -179,7 +179,9 @@ export default class Drawflow {
 
   click(e) {
     this.dispatch('click', e);
-    e.target.style.cursor = 'move';
+    if (e && e.target && (e.target.className === 'drawflow' || e.target.className === 'parent-drawflow')) {
+      e.target.style.cursor = 'grab';
+    }
     if(this.editor_mode === 'fixed') {
       //return false;
       if(e.target.classList[0] === 'parent-drawflow' || e.target.classList[0] === 'drawflow') {
