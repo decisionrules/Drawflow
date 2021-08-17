@@ -179,6 +179,7 @@ export default class Drawflow {
 
   click(e) {
     this.dispatch('click', e);
+    e.target.style.cursor = 'move';
     if(this.editor_mode === 'fixed') {
       //return false;
       if(e.target.classList[0] === 'parent-drawflow' || e.target.classList[0] === 'drawflow') {
@@ -441,6 +442,7 @@ export default class Drawflow {
       var e_pos_y = e.clientY;
       var ele_last = e.target;
     }
+    e.target.style.cursor = 'default';
 
     if(this.drag) {
       if(this.pos_x_start != e_pos_x || this.pos_y_start != e_pos_y) {
