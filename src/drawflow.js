@@ -33,7 +33,6 @@ export default class Drawflow {
     this.useuuid = false;
 
 
-
     this.select_elements = null;
     this.noderegister = {};
     this.render = render;
@@ -41,11 +40,11 @@ export default class Drawflow {
     // Configurable options
     this.module = 'Home';
     this.editor_mode = 'edit';
-    this.zoom = 1;
+    this.zoom = 0;
     this.zoom_max = 1.6;
     this.zoom_min = 0.5;
     this.zoom_value = 0.1;
-    this.zoom_last_value = 1;
+    this.zoom_last_value = 0;
 
     // Mobile
     this.evCache = new Array();
@@ -814,8 +813,14 @@ export default class Drawflow {
         elemsOut[item].children[0].setAttributeNS(null, 'd', 'M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y );
         */
 
-        const lineCurve = createCurvature(line_x, line_y, x, y, curvature, 'openclose');
-        elemsOut[item].children[0].setAttributeNS(null, 'd', lineCurve );
+        let canCreateCurve = true;
+        if (line_x === Infinity || line_y === Infinity || x === Infinity || y ===Infinity) {
+          canCreateCurve = false;
+        }
+        if (canCreateCurve) {
+          const lineCurve = createCurvature(line_x, line_y, x, y, curvature, 'openclose');
+          elemsOut[item].children[0].setAttributeNS(null, 'd', lineCurve );
+        }
       } else {
         const points = elemsOut[item].querySelectorAll('.point');
         let linecurve = '';
@@ -1006,9 +1011,15 @@ export default class Drawflow {
         var hx2 = x - Math.abs(x - line_x) * curvature;
         // console.log('M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y );
         elems[item].children[0].setAttributeNS(null, 'd', 'M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y );*/
-        const lineCurve = createCurvature(line_x, line_y, x, y, curvature, 'openclose');
-        elems[item].children[0].setAttributeNS(null, 'd', lineCurve );
 
+        let canCreateCurve = true;
+        if (line_x === Infinity || line_y === Infinity || x === Infinity || y ===Infinity) {
+          canCreateCurve = false;
+        }
+        if (canCreateCurve) {
+          const lineCurve = createCurvature(line_x, line_y, x, y, curvature, 'openclose');
+          elems[item].children[0].setAttributeNS(null, 'd', lineCurve );
+        }
       } else {
         const points = elems[item].querySelectorAll('.point');
         let linecurve = '';
@@ -1996,6 +2007,17 @@ export default class Drawflow {
     this.zoom_last_value = 1;
     this.precanvas.style.transform = '';
     this.import(this.drawflow);
+  }
+
+  updateZoom(positions) {
+    this.canvas_x = positions.canvas_x;
+    this.canvas_y = positions.canvas_y;
+    this.pos_x = positions.pos_x;
+    this.pos_y = positions.pos_y;
+    this.pos_x_start = positions.pos_x;
+    this.pos_y_start = positions.pos_y;
+    this.zoom = positions.zoom;
+    this.zoom_last_value = positions.zoom;
   }
 
   removeModule(name) {
