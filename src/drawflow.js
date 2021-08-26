@@ -583,7 +583,6 @@ export default class Drawflow {
   }
 
   zoom_enter(event, delta) {
-    if (event.ctrlKey) {
       event.preventDefault()
       if(event.deltaY > 0) {
         // Zoom Out
@@ -593,7 +592,6 @@ export default class Drawflow {
         this.zoom_in();
       }
       //this.precanvas.style.transform = "translate("+this.canvas_x+"px, "+this.canvas_y+"px) scale("+this.zoom+")";
-    }
   }
   zoom_refresh(){
     this.dispatch('zoom', this.zoom);
@@ -618,6 +616,15 @@ export default class Drawflow {
     if(this.zoom != 1) {
       this.zoom = 1;
       this.zoom_refresh();
+    }
+  }
+
+  curvature_refresh() {
+    for (const key in this.drawflow.drawflow[this.module].data) {
+      if (Object.hasOwnProperty.call(this.drawflow.drawflow[this.module].data, key)) {
+        const element = this.drawflow.drawflow[this.module].data[key];
+        this.updateConnectionNodes('node-'+element.id);
+      }
     }
   }
 
