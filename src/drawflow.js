@@ -369,8 +369,11 @@ export default class Drawflow {
       this.ele_selected.style.top = (this.ele_selected.offsetTop - y) + "px";
       this.ele_selected.style.left = (this.ele_selected.offsetLeft - x) + "px";
 
-      this.drawflow.drawflow[this.module].data[this.ele_selected.id.slice(5)].pos_x = (this.ele_selected.offsetLeft - x);
-      this.drawflow.drawflow[this.module].data[this.ele_selected.id.slice(5)].pos_y = (this.ele_selected.offsetTop - y);
+      var node = this.drawflow.drawflow[this.module].data[this.ele_selected.id.slice(5)];
+      if (node) {
+        node.pos_x = (this.ele_selected.offsetLeft - x);
+        node.pos_y = (this.ele_selected.offsetTop - y);
+      }
 
       this.updateConnectionNodes(this.ele_selected.id)
     }
@@ -583,15 +586,15 @@ export default class Drawflow {
   }
 
   zoom_enter(event, delta) {
-      event.preventDefault()
-      if(event.deltaY > 0) {
-        // Zoom Out
-        this.zoom_out();
-      } else {
-        // Zoom In
-        this.zoom_in();
-      }
-      //this.precanvas.style.transform = "translate("+this.canvas_x+"px, "+this.canvas_y+"px) scale("+this.zoom+")";
+    event.preventDefault()
+    if(event.deltaY > 0) {
+      // Zoom Out
+      this.zoom_out();
+    } else {
+      // Zoom In
+      this.zoom_in();
+    }
+    //this.precanvas.style.transform = "translate("+this.canvas_x+"px, "+this.canvas_y+"px) scale("+this.zoom+")";
   }
   zoom_refresh(){
     this.dispatch('zoom', this.zoom);
@@ -1871,8 +1874,9 @@ export default class Drawflow {
     this.dispatch('beforeNodeRemoved', id.slice(5));
     this.removeConnectionNodeId(id);
     var moduleName = this.getModuleFromNodeId(id.slice(5))
-    if(this.module === moduleName) {
-      this.container.querySelector(`#${id}`).remove();
+    var htmlNode = this.container.querySelector(`#${id}`);
+    if(this.module === moduleName && htmlNode) {
+      htmlNode.remove();
     }
     delete this.drawflow.drawflow[moduleName].data[id.slice(5)];
     this.dispatch('nodeRemoved', id.slice(5));
