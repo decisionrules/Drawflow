@@ -473,7 +473,7 @@ export default class Drawflow {
           } else {
             var input_id = ele_last.id;
           }
-          if(Object.keys(this.getNodeFromId(input_id.slice(5)).inputs).length === 0) {
+          if(this.getNodeFromId(input_id.slice(5)) !== undefined && this.getNodeFromId(input_id.slice(5)).inputs && Object.keys(this.getNodeFromId(input_id.slice(5)).inputs).length === 0) {
             var input_class = false;
           } else {
             var input_class = "input_1";
@@ -500,8 +500,10 @@ export default class Drawflow {
             var id_input = input_id.slice(5);
             var id_output = output_id.slice(5);
 
-            this.drawflow.drawflow[this.module].data[id_output].outputs[output_class].connections.push( {"node": id_input, "output": input_class});
-            this.drawflow.drawflow[this.module].data[id_input].inputs[input_class].connections.push( {"node": id_output, "input": output_class});
+            if (this.drawflow.drawflow[this.module].data[id_input] !== undefined && this.drawflow.drawflow[this.module].data[id_output].outputs && this.drawflow.drawflow[this.module].data[id_output].inputs) {
+              this.drawflow.drawflow[this.module].data[id_output].outputs[output_class].connections.push( {"node": id_input, "output": input_class});
+              this.drawflow.drawflow[this.module].data[id_input].inputs[input_class].connections.push( {"node": id_output, "input": output_class});
+            }
             this.updateConnectionNodes('node-'+id_output);
             this.updateConnectionNodes('node-'+id_input);
             this.dispatch('connectionCreated', { output_id: id_output, input_id: id_input, output_class:  output_class, input_class: input_class});
@@ -671,7 +673,6 @@ export default class Drawflow {
         return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y;
         break;
       default:
-
         var hx1 = line_x + Math.abs(x - line_x) * curvature;
         var hx2 = x - Math.abs(x - line_x) * curvature;
 
@@ -713,17 +714,21 @@ export default class Drawflow {
 
     var x = eX * ( this.precanvas.clientWidth / (this.precanvas.clientWidth * this.zoom)) - (this.precanvas.getBoundingClientRect().x *  ( this.precanvas.clientWidth / (this.precanvas.clientWidth * this.zoom)) );
     var y = eY * ( this.precanvas.clientHeight / (this.precanvas.clientHeight * this.zoom)) - (this.precanvas.getBoundingClientRect().y *  ( this.precanvas.clientHeight / (this.precanvas.clientHeight * this.zoom)) );
-
     /*
     var curvature = 0.5;
     var hx1 = line_x + Math.abs(x - line_x) * curvature;
     var hx2 = x - Math.abs(x - line_x) * curvature;
     */
+    // console.log(x);
+    if (x !== NaN) {
+      //path.setAttributeNS(null, 'd', 'M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y);
+      var curvature = this.curvature;
+      var lineCurve = this.createCurvature(line_x, line_y, x, y, curvature, 'openclose');
 
-    //path.setAttributeNS(null, 'd', 'M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y);
-    var curvature = this.curvature;
-    var lineCurve = this.createCurvature(line_x, line_y, x, y, curvature, 'openclose');
-    path.setAttributeNS(null, 'd', lineCurve);
+      if (!lineCurve.includes('NaN')) {
+        path.setAttributeNS(null, 'd', lineCurve);
+      }
+    }
 
   }
 
@@ -1334,7 +1339,9 @@ export default class Drawflow {
 
   getNodeFromId(id) {
     var moduleName = this.getModuleFromNodeId(id)
-    return JSON.parse(JSON.stringify(this.drawflow.drawflow[moduleName].data[id]));
+    if (this.drawflow.drawflow[moduleName] && this.drawflow.drawflow[moduleName].data) {
+      return JSON.parse(JSON.stringify(this.drawflow.drawflow[moduleName].data[id]));
+    }
   }
   getNodesFromName(name) {
     var nodes = [];
@@ -1953,15 +1960,19 @@ export default class Drawflow {
     for(var i = elemsOut.length-1; i >= 0; i--) {
       var listclass = elemsOut[i].classList;
 
-      var index_in = this.drawflow.drawflow[this.module].data[listclass[1].slice(13)].inputs[listclass[4]].connections.findIndex(function(item,i) {
-        return item.node === listclass[2].slice(14) && item.input === listclass[3]
-      });
-      this.drawflow.drawflow[this.module].data[listclass[1].slice(13)].inputs[listclass[4]].connections.splice(index_in,1);
+      if (this.drawflow.drawflow[this.module].data[listclass[1].slice(13)] && this.drawflow.drawflow[this.module].data[listclass[1].slice(13)].inputs) {
+        var index_in = this.drawflow.drawflow[this.module].data[listclass[1].slice(13)].inputs[listclass[4]].connections.findIndex(function(item,i) {
+          return item.node === listclass[2].slice(14) && item.input === listclass[3]
+        });
+        this.drawflow.drawflow[this.module].data[listclass[1].slice(13)].inputs[listclass[4]].connections.splice(index_in,1);
+      }
 
-      var index_out = this.drawflow.drawflow[this.module].data[listclass[2].slice(14)].outputs[listclass[3]].connections.findIndex(function(item,i) {
-        return item.node === listclass[1].slice(13) && item.output === listclass[4]
-      });
-      this.drawflow.drawflow[this.module].data[listclass[2].slice(14)].outputs[listclass[3]].connections.splice(index_out,1);
+      if (this.drawflow.drawflow[this.module].data[listclass[2].slice(14)] && this.drawflow.drawflow[this.module].data[listclass[2].slice(14)].outputs) {
+        var index_out = this.drawflow.drawflow[this.module].data[listclass[2].slice(14)].outputs[listclass[3]].connections.findIndex(function(item,i) {
+          return item.node === listclass[1].slice(13) && item.output === listclass[4]
+        });
+        this.drawflow.drawflow[this.module].data[listclass[2].slice(14)].outputs[listclass[3]].connections.splice(index_out,1);
+      }
 
       elemsOut[i].remove();
 
