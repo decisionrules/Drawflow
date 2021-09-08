@@ -65,6 +65,9 @@ Download or clone repository and copy the dist folder, CDN option Or npm.
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css">
 <script src="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.js"></script>
+# or
+<link rel="stylesheet" href="https://unpkg.com/drawflow@0.0.45/dist/drawflow.min.css" />
+<script src="https://unpkg.com/drawflow@0.0.45/dist/drawflow.min.js"></script>
 ```
 
 #### NPM
@@ -105,13 +108,14 @@ Parameter | Type | Description
 --- | --- | ---
 `id` | Object | Name of module
 `render` | Object | It's for `Vue`.
+`parent` | Object | It's for `Vue`. The parent Instance
 
 ### For vue 2 example.
 ```javascript
 import Vue from 'vue'
 
 // Pass render Vue
-this.editor = new Drawflow(id, Vue);
+this.editor = new Drawflow(id, Vue, this);
 ```
 
 ### For vue 3 example.
@@ -119,7 +123,7 @@ this.editor = new Drawflow(id, Vue);
 import * as Vue from 'vue'
 
 // Pass render Vue
-this.editor = new Drawflow(id, Vue);
+this.editor = new Drawflow(id, Vue, this);
 ```
 
 ### Nuxt
@@ -207,7 +211,7 @@ Parameter | Type | Description
 `html` | text | HTML drawn on node or `name` of register node.
 `typenode` | boolean & text | Default `false`, `true` for Object HTML, `vue` for vue
 
-You can use the attribute `df-*` in **inputs, textarea or select** to synchronize with the node data.
+You can use the attribute `df-*` in **inputs, textarea or select** to synchronize with the node data and **contenteditable**.
 
 Atrributs multiples parents support `df-*-*...`
 
@@ -284,6 +288,7 @@ Event | Return | Description
 --- | --- | ---
   `nodeCreated` | id | `id` of Node
   `nodeRemoved` | id | `id` of Node
+  `nodeDataChanged` | id | `id` of Node df-* attributes changed.
   `nodeSelected` | id | `id` of Node
   `nodeUnselected` | true | Unselect node
   `nodeMoved` | id | `id` of Node
@@ -295,6 +300,7 @@ Event | Return | Description
   `connectionUnselected` | true | Unselect connection
   `addReroute` | id | `id` of Node output
   `removeReroute` | id | `id` of Node output
+  `rerouteMoved` | id | `id` of Node output
   `moduleCreated` | name | `name` of Module
   `moduleChanged` | name | `name` of Module
   `moduleRemoved` | name | `name` of Module
