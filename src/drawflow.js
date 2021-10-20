@@ -1,5 +1,5 @@
 export default class Drawflow {
-  constructor(container, render = null, parent = null) {
+  constructor(container, readMode = false, render = null, parent = null) {
     this.events = {};
     this.container = container;
     this.precanvas = null;
@@ -49,6 +49,9 @@ export default class Drawflow {
     // Mobile
     this.evCache = new Array();
     this.prevDiff = -1;
+
+    // Read Mode
+    this.readMode = readMode;
   }
 
   start () {
@@ -68,10 +71,12 @@ export default class Drawflow {
     this.container.addEventListener('touchmove', this.position.bind(this));
     this.container.addEventListener('touchstart', this.click.bind(this));
 
-    /* Context Menu */
-    this.container.addEventListener('contextmenu', this.contextmenu.bind(this));
-    /* Delete */
-    this.container.addEventListener('keydown', this.key.bind(this));
+    if (!this.readMode) {
+      /* Context Menu */
+      this.container.addEventListener('contextmenu', this.contextmenu.bind(this));
+      /* Delete */
+      this.container.addEventListener('keydown', this.key.bind(this));
+    }
 
     /* Zoom Mouse */
     this.container.addEventListener('wheel', this.zoom_enter.bind(this));
