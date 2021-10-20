@@ -236,18 +236,20 @@ export default class Drawflow {
         }
         break;
       case 'output':
-        this.connection = true;
-        if(this.node_selected != null) {
-          this.node_selected.classList.remove("selected");
-          this.node_selected = null;
-          this.dispatch('nodeUnselected', true);
+        if (!this.readMode) {
+          this.connection = true;
+          if (this.node_selected != null) {
+            this.node_selected.classList.remove("selected");
+            this.node_selected = null;
+            this.dispatch('nodeUnselected', true);
+          }
+          if (this.connection_selected != null) {
+            this.connection_selected.classList.remove("selected");
+            this.removeReouteConnectionSelected();
+            this.connection_selected = null;
+          }
+          this.drawConnection(e.target);
         }
-        if(this.connection_selected != null) {
-          this.connection_selected.classList.remove("selected");
-          this.removeReouteConnectionSelected();
-          this.connection_selected = null;
-        }
-        this.drawConnection(e.target);
         break;
       case 'parent-drawflow':
         if(this.node_selected != null) {
@@ -356,7 +358,7 @@ export default class Drawflow {
       this.dispatch('translate', { x: x, y: y});
       this.precanvas.style.transform = "translate("+x+"px, "+y+"px) scale("+this.zoom+")";
     }
-    if(this.drag) {
+    if(this.drag && !this.readMode) {
       this.dispatch('beforeNodeMoved', this.ele_selected.id.slice(5));
       var x = (this.pos_x - e_pos_x) * this.precanvas.clientWidth / (this.precanvas.clientWidth * this.zoom);
       var y = (this.pos_y - e_pos_y) * this.precanvas.clientHeight / (this.precanvas.clientHeight * this.zoom);
@@ -442,9 +444,9 @@ export default class Drawflow {
 
     if(this.drag_point) {
       this.ele_selected.classList.remove("selected");
-        if(this.pos_x_start != e_pos_x || this.pos_y_start != e_pos_y) {
-          this.dispatch('rerouteMoved', this.ele_selected.parentElement.classList[2].slice(14));
-        }
+      if(this.pos_x_start != e_pos_x || this.pos_y_start != e_pos_y) {
+        this.dispatch('rerouteMoved', this.ele_selected.parentElement.classList[2].slice(14));
+      }
     }
 
     if(this.editor_selected) {
@@ -576,14 +578,14 @@ export default class Drawflow {
   }
 
   zoom_enter(event, delta) {
-      event.preventDefault()
-      if(event.deltaY > 0) {
-        // Zoom Out
-        this.zoom_out();
-      } else {
-        // Zoom In
-        this.zoom_in();
-      }
+    event.preventDefault()
+    if(event.deltaY > 0) {
+      // Zoom Out
+      this.zoom_out();
+    } else {
+      // Zoom In
+      this.zoom_in();
+    }
   }
   zoom_refresh(){
     this.dispatch('zoom', this.zoom);
@@ -1518,19 +1520,19 @@ export default class Drawflow {
     var attr = event.target.attributes
     for (var i = 0; i < attr.length; i++) {
       if (attr[i].nodeName.startsWith('df-')) {
-          var keys = attr[i].nodeName.slice(3).split("-");
-          var target = this.drawflow.drawflow[this.module].data[event.target.closest(".drawflow_content_node").parentElement.id.slice(5)].data;
-          for (var index = 0; index < keys.length - 1; index += 1) {
-              if (target[keys[index]] == null) {
-                  target[keys[index]] = {};
-              }
-              target = target[keys[index]];
+        var keys = attr[i].nodeName.slice(3).split("-");
+        var target = this.drawflow.drawflow[this.module].data[event.target.closest(".drawflow_content_node").parentElement.id.slice(5)].data;
+        for (var index = 0; index < keys.length - 1; index += 1) {
+          if (target[keys[index]] == null) {
+            target[keys[index]] = {};
           }
-          target[keys[keys.length - 1]] = event.target.value;
-          if(event.target.isContentEditable) {
-            target[keys[keys.length - 1]] = event.target.innerText;
-          }
-          this.dispatch('nodeDataChanged', event.target.closest(".drawflow_content_node").parentElement.id.slice(5));
+          target = target[keys[index]];
+        }
+        target[keys[keys.length - 1]] = event.target.value;
+        if(event.target.isContentEditable) {
+          target[keys[keys.length - 1]] = event.target.innerText;
+        }
+        this.dispatch('nodeDataChanged', event.target.closest(".drawflow_content_node").parentElement.id.slice(5));
       }
     }
   }
@@ -1666,21 +1668,21 @@ export default class Drawflow {
 
     nodeUpdates.forEach((itemx, i) => {
       this.drawflow.drawflow[moduleName].data[itemx.node].outputs[itemx.input].connections.forEach((itemz, g) => {
-          if(itemz.node == id) {
-            const output_id = itemz.output.slice(6);
-            if(parseInt(input_class_id) < parseInt(output_id)) {
-              if(this.module === moduleName) {
-                const ele = this.container.querySelector(".connection.node_in_node-"+id+".node_out_node-"+itemx.node+"."+itemx.input+".input_"+output_id);
-                ele.classList.remove('input_'+output_id);
-                ele.classList.add('input_'+(output_id-1));
-              }
-              if(itemz.points) {
-                  this.drawflow.drawflow[moduleName].data[itemx.node].outputs[itemx.input].connections[g] = { node: itemz.node, output: 'input_'+(output_id-1), points: itemz.points }
-              } else {
-                  this.drawflow.drawflow[moduleName].data[itemx.node].outputs[itemx.input].connections[g] = { node: itemz.node, output: 'input_'+(output_id-1)}
-              }
+        if(itemz.node == id) {
+          const output_id = itemz.output.slice(6);
+          if(parseInt(input_class_id) < parseInt(output_id)) {
+            if(this.module === moduleName) {
+              const ele = this.container.querySelector(".connection.node_in_node-"+id+".node_out_node-"+itemx.node+"."+itemx.input+".input_"+output_id);
+              ele.classList.remove('input_'+output_id);
+              ele.classList.add('input_'+(output_id-1));
+            }
+            if(itemz.points) {
+              this.drawflow.drawflow[moduleName].data[itemx.node].outputs[itemx.input].connections[g] = { node: itemz.node, output: 'input_'+(output_id-1), points: itemz.points }
+            } else {
+              this.drawflow.drawflow[moduleName].data[itemx.node].outputs[itemx.input].connections[g] = { node: itemz.node, output: 'input_'+(output_id-1)}
             }
           }
+        }
       });
     });
     this.updateConnectionNodes('node-'+id);
@@ -1748,9 +1750,9 @@ export default class Drawflow {
               ele.classList.add(itemx.output);
             }
             if(itemz.points) {
-                this.drawflow.drawflow[moduleName].data[itemx.node].inputs[itemx.output].connections[g] = { node: itemz.node, input: 'output_'+(input_id-1), points: itemz.points }
+              this.drawflow.drawflow[moduleName].data[itemx.node].inputs[itemx.output].connections[g] = { node: itemz.node, input: 'output_'+(input_id-1), points: itemz.points }
             } else {
-                this.drawflow.drawflow[moduleName].data[itemx.node].inputs[itemx.output].connections[g] = { node: itemz.node, input: 'output_'+(input_id-1)}
+              this.drawflow.drawflow[moduleName].data[itemx.node].inputs[itemx.output].connections[g] = { node: itemz.node, input: 'output_'+(input_id-1)}
             }
           }
         }
@@ -1959,46 +1961,46 @@ export default class Drawflow {
 
   /* Events */
   on (event, callback) {
-     // Check if the callback is not a function
-     if (typeof callback !== 'function') {
-         console.error(`The listener callback must be a function, the given type is ${typeof callback}`);
-         return false;
-     }
-     // Check if the event is not a string
-     if (typeof event !== 'string') {
-         console.error(`The event name must be a string, the given type is ${typeof event}`);
-         return false;
-     }
-     // Check if this event not exists
-     if (this.events[event] === undefined) {
-         this.events[event] = {
-             listeners: []
-         }
-     }
-     this.events[event].listeners.push(callback);
-   }
+    // Check if the callback is not a function
+    if (typeof callback !== 'function') {
+      console.error(`The listener callback must be a function, the given type is ${typeof callback}`);
+      return false;
+    }
+    // Check if the event is not a string
+    if (typeof event !== 'string') {
+      console.error(`The event name must be a string, the given type is ${typeof event}`);
+      return false;
+    }
+    // Check if this event not exists
+    if (this.events[event] === undefined) {
+      this.events[event] = {
+        listeners: []
+      }
+    }
+    this.events[event].listeners.push(callback);
+  }
 
-   removeListener (event, callback) {
-     // Check if this event not exists
-     if (this.events[event] === undefined) {
-         //console.error(`This event: ${event} does not exist`);
-         return false;
-     }
-     this.events[event].listeners = this.events[event].listeners.filter(listener => {
-         return listener.toString() !== callback.toString();
-     });
-   }
+  removeListener (event, callback) {
+    // Check if this event not exists
+    if (this.events[event] === undefined) {
+      //console.error(`This event: ${event} does not exist`);
+      return false;
+    }
+    this.events[event].listeners = this.events[event].listeners.filter(listener => {
+      return listener.toString() !== callback.toString();
+    });
+  }
 
-   dispatch (event, details) {
-     // Check if this event not exists
-     if (this.events[event] === undefined) {
-         // console.error(`This event: ${event} does not exist`);
-         return false;
-     }
-     this.events[event].listeners.forEach((listener) => {
-         listener(details);
-     });
-   }
+  dispatch (event, details) {
+    // Check if this event not exists
+    if (this.events[event] === undefined) {
+      // console.error(`This event: ${event} does not exist`);
+      return false;
+    }
+    this.events[event].listeners.forEach((listener) => {
+      listener(details);
+    });
+  }
 
   getUuid() {
     // http://www.ietf.org/rfc/rfc4122.txt
