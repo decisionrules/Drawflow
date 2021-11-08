@@ -42,8 +42,8 @@ export default class Drawflow {
     this.editor_mode = 'edit';
     this.zoom = 0;
     this.zoom_max = 1.6;
-    this.zoom_min = 0.5;
-    this.zoom_value = 0.1;
+    this.zoom_min = 0.15;
+    this.zoom_value = 0.05;
     this.zoom_last_value = 0;
 
     // Mobile
