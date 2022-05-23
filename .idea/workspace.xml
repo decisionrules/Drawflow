@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b28a251a-dfdb-46ff-9506-405a39f82b33" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/dist/drawflow.min.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/drawflow.min.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/drawflow.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/drawflow.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webpack.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/webpack.config.js" afterDir="false" />
-    </list>
+    <list default="true" id="b28a251a-dfdb-46ff-9506-405a39f82b33" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="bae507dbca01fa610a7c72dd915370099590ae5a" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitToolBoxStore">
@@ -63,7 +62,7 @@
       <option name="presentableId" value="Default" />
       <updated>1651152598598</updated>
       <workItem from="1651152599930" duration="240000" />
-      <workItem from="1653301331422" duration="7814000" />
+      <workItem from="1653301331422" duration="8215000" />
     </task>
     <servers />
   </component>
